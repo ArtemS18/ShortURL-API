@@ -1,0 +1,35 @@
+app-env: dev
+database-type: 'in-memory'
+
+server:
+  node-id: 1
+  host: localhost
+  port: 8000
+  base-url: http://localhost:8000/api/v1
+  write-timeout: 5s
+  read-timeout: 5s
+  idle-timeout: 20s
+
+postgres:
+  host: localhost
+  port: 5435
+  user: shorturls
+  password: shorturls
+  database: main
+  sslmode: disable
+  max-open-connections: 10
+  conn-max-lifetime: 30s
+  max-idle-conns: 50
+  conn-max-idle-time: 15s
+
+cors:
+  allowed-origins:
+    - http://localhost:3000
+  allowed-methods:
+    - GET
+    - POST
+    - PUT
+    - DELETE
+  allowed-headers:
+    - Content-Type
+    - Authorization
