@@ -14,7 +14,14 @@ import (
 
 func TestCreateSlug(t *testing.T) {
 	t.Parallel()
-	query := regexp.QuoteMeta(`INSERT INTO slugs (id, slug, url) VALUES ($1, $2, $3)`)
+
+	// Экранируем обновленный SQL-запрос
+	query := regexp.QuoteMeta(`INSERT INTO slugs (id, slug, url) 
+            VALUES ($1, $2, $3)
+            ON CONFLICT (url) 
+            DO UPDATE SET url = EXCLUDED.url
+            RETURNING slug, (xmax = 0) AS is_inserted;`)
+
 	ID := int64(123)
 	input := dto.CreateSlugDB{
 		Slug: "slug",
@@ -26,28 +33,55 @@ func TestCreateSlug(t *testing.T) {
 		name      string
 		input     dto.CreateSlugDB
 		setupMock func(m pgxmock.PgxPoolIface)
-		want      []entity.URL
+		want      *dto.CreateSlugResponse
 		wantErr   error
 	}{
 		{
-			name:  "OK",
+			name:  "OK - New Slug Created",
 			input: input,
 			setupMock: func(m pgxmock.PgxPoolIface) {
-				m.ExpectExec(query).
+				rows := pgxmock.NewRows([]string{"slug", "is_inserted"}).
+					AddRow(input.Slug, true)
+				m.ExpectQuery(query).
 					WithArgs(input.ID, input.Slug, input.URL).
-					WillReturnResult(pgxmock.NewResult("INSERT", 1))
+					WillReturnRows(rows)
+			},
+			want: &dto.CreateSlugResponse{
+				SlugURL:   input.Slug,
+				IsCreated: true,
 			},
 			wantErr: nil,
 		},
 		{
-			name:  "Already exists",
+			name:  "OK - Slug Already Existed",
 			input: input,
 			setupMock: func(m pgxmock.PgxPoolIface) {
-				m.ExpectExec(query).WithArgs(input.ID, input.Slug, input.URL).WillReturnError(errors.New("pg error"))
+				rows := pgxmock.NewRows([]string{"slug", "is_inserted"}).
+					AddRow("old-slug", false)
+
+				m.ExpectQuery(query).
+					WithArgs(input.ID, input.Slug, input.URL).
+					WillReturnRows(rows)
 			},
+			want: &dto.CreateSlugResponse{
+				SlugURL:   "old-slug",
+				IsCreated: false,
+			},
+			wantErr: nil,
+		},
+		{
+			name:  "Database Error",
+			input: input,
+			setupMock: func(m pgxmock.PgxPoolIface) {
+				m.ExpectQuery(query).
+					WithArgs(input.ID, input.Slug, input.URL).
+					WillReturnError(errors.New("pg error"))
+			},
+			want:    nil,
 			wantErr: entity.ServiceError,
 		},
 	}
+
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
@@ -57,17 +91,18 @@ func TestCreateSlug(t *testing.T) {
 
 			test.setupMock(mock)
 
-			repo := NewSlugRepo(mock)
-
-			err = repo.CreateSlug(context.Background(), &test.input)
+			repoService := NewSlugRepo(mock)
+			res, err := repoService.CreateSlug(context.Background(), &test.input)
 			if test.wantErr != nil {
 				require.ErrorIs(t, err, test.wantErr)
+				require.Nil(t, res)
 				return
 			}
+
 			require.NoError(t, err)
+			require.Equal(t, test.want, res)
 		})
 	}
-
 }
 
 func TestGetURL(t *testing.T) {
@@ -135,7 +170,7 @@ func TestGetURL(t *testing.T) {
 
 			repo := NewSlugRepo(mock)
 
-			res, err := repo.GetURL(context.Background(), test.slug)
+			res, err := repo.GetURL(context.Background(), &entity.Slug{Value: test.slug})
 			if test.wantErr != nil {
 				require.ErrorIs(t, err, test.wantErr)
 				require.Nil(t, res)

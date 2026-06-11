@@ -20,7 +20,7 @@ type SlugUseCase struct {
 }
 
 func createSlugURL(slug string) string {
-	return fmt.Sprintf("%s/%s", config.Config.Server.BaseURL, slug)
+	return fmt.Sprintf("%s%s/%s", config.Config.Server.BaseURL, "/slugs", slug)
 }
 
 func NewSlugUseCase(repo usecase.SlugRepository, gen usecase.SlugGenerator) *SlugUseCase {
@@ -34,7 +34,7 @@ func (uc *SlugUseCase) GetURL(ctx context.Context, e *dto.GetURLRequest) (*dto.G
 	if err := uc.validateSlug(e.SlugURL); err != nil {
 		return nil, fmt.Errorf("uc.validateSlug: %w", err)
 	}
-	urlEntity, err := uc.repo.GetURL(ctx, e.SlugURL)
+	urlEntity, err := uc.repo.GetURL(ctx, &entity.Slug{Value: e.SlugURL})
 	if err != nil {
 		return nil, fmt.Errorf("uc.repo.GetURL: %w", err)
 	}
@@ -45,16 +45,16 @@ func (uc *SlugUseCase) CreateSlug(ctx context.Context, e *dto.CreateSlugRequest)
 	if err := uc.validateURL(e.URL); err != nil {
 		return nil, fmt.Errorf("uc.validateURL: %w", err)
 	}
-	slugInfo, err := uc.gen.GenerateSlug(e.URL)
+	slugInfo, err := uc.gen.GenerateSlug(&entity.URL{Value: e.URL})
 	if err != nil {
 		return nil, fmt.Errorf("uc.gen.GenerateSlug: %w", err)
 	}
-	err = uc.repo.CreateSlug(ctx, slugInfo)
+	data, err := uc.repo.CreateSlug(ctx, slugInfo)
 	if err != nil {
 		return nil, fmt.Errorf("uc.repo.CreateSlug: %w", err)
 	}
-	slugURL := createSlugURL(slugInfo.Slug)
-	return &dto.CreateSlugResponse{SlugURL: slugURL}, nil
+	data.SlugURL = createSlugURL(data.SlugURL)
+	return data, nil
 }
 
 func (uc *SlugUseCase) validateURL(url string) error {

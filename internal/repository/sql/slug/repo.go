@@ -2,6 +2,7 @@ package slug
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/ArtemS18/ShortURL-API/internal/entity"
 	repo "github.com/ArtemS18/ShortURL-API/internal/repository/sql"
@@ -20,9 +21,9 @@ func NewSlugRepo(pool repo.DB) usecase.SlugRepository {
 	}
 }
 
-func (r *SlugRepo) GetURL(ctx context.Context, slug string) (*entity.URL, error) {
+func (r *SlugRepo) GetURL(ctx context.Context, slug *entity.Slug) (*entity.URL, error) {
 	sql := `SELECT url FROM slugs WHERE slug=$1`
-	row, err := r.pool.Query(ctx, sql, slug)
+	row, err := r.pool.Query(ctx, sql, slug.Value)
 
 	if err != nil {
 		return nil, repo.HandelPgErrors(err, "slug")
@@ -39,11 +40,30 @@ func (r *SlugRepo) GetURL(ctx context.Context, slug string) (*entity.URL, error)
 
 }
 
-func (r *SlugRepo) CreateSlug(ctx context.Context, e *dto.CreateSlugDB) error {
-	sql := `INSERT INTO slugs (id, slug, url) VALUES ($1, $2, $3)`
-	_, err := r.pool.Exec(ctx, sql, e.ID, e.Slug, e.URL)
+func (r *SlugRepo) CreateSlug(ctx context.Context, e *dto.CreateSlugDB) (*dto.CreateSlugResponse, error) {
+	sql := `INSERT INTO slugs (id, slug, url) 
+            VALUES ($1, $2, $3)
+            ON CONFLICT (url) 
+            DO UPDATE SET url = EXCLUDED.url
+            RETURNING slug, (xmax = 0) AS is_inserted;`
+
+	row, err := r.pool.Query(ctx, sql, e.ID, e.Slug, e.URL)
 	if err != nil {
-		return repo.HandelPgErrors(err, "slug")
+		return nil, repo.HandelPgErrors(err, "slug")
 	}
-	return nil
+	defer row.Close()
+
+	if row.Next() {
+		var returnedSlug string
+		var isInserted bool
+		err = row.Scan(&returnedSlug, &isInserted)
+		if err != nil {
+			return nil, repo.HandelPgErrors(err, "slug")
+		}
+		return &dto.CreateSlugResponse{
+			SlugURL:   returnedSlug,
+			IsCreated: isInserted,
+		}, nil
+	}
+	return nil, fmt.Errorf("no rows returned from insert")
 }

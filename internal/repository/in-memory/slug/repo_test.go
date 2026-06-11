@@ -48,7 +48,7 @@ func TestInMemorySlugRepo_CreateSlugDB(t *testing.T) {
 			repo := NewInMemorySlugRepo()
 			test.setup(repo)
 
-			err := repo.CreateSlug(context.Background(), &test.input)
+			_, err := repo.CreateSlug(context.Background(), &test.input)
 			if test.wantErr != nil {
 				require.ErrorAs(t, err, &test.wantErr)
 				return
@@ -64,7 +64,7 @@ func TestInMemorySlugRepo_GetURL(t *testing.T) {
 	tests := []struct {
 		name    string
 		setup   func(r *SlugRepo)
-		slug    string
+		slug    *entity.Slug
 		want    *entity.URL
 		wantErr error
 	}{
@@ -73,14 +73,14 @@ func TestInMemorySlugRepo_GetURL(t *testing.T) {
 			setup: func(r *SlugRepo) {
 				r.slugs["go"] = "https://go.dev"
 			},
-			slug:    "go",
+			slug:    &entity.Slug{Value: "go"},
 			want:    &entity.URL{Value: "https://go.dev"},
 			wantErr: nil,
 		},
 		{
 			name:    "Error - Not Found",
 			setup:   func(r *SlugRepo) {},
-			slug:    "missing",
+			slug:    &entity.Slug{Value: "missing"},
 			want:    nil,
 			wantErr: &entity.NotFoundError{Field: "slug"},
 		},
@@ -123,11 +123,11 @@ func TestConcurencyCreateSlugRepo(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			_ = repo.CreateSlug(context.Background(), &input)
+			_, _ = repo.CreateSlug(context.Background(), &input)
 		}()
 	}
 	wg.Wait()
-	resp, err := repo.GetURL(context.Background(), input.Slug)
+	resp, err := repo.GetURL(context.Background(), &entity.Slug{Value: input.Slug})
 	require.NoError(t, err)
 	require.Equal(t, resp, want)
 	require.NoError(t, err)
@@ -146,14 +146,14 @@ func TestConcurencyGetSlugRepo(t *testing.T) {
 
 	want := &entity.URL{Value: "https://ya.ru"}
 	repo := NewInMemorySlugRepo()
-	err := repo.CreateSlug(context.Background(), &exits)
+	_, err := repo.CreateSlug(context.Background(), &exits)
 	require.NoError(t, err)
 
 	for range 10 {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			resp, err := repo.GetURL(context.Background(), exits.Slug)
+			resp, err := repo.GetURL(context.Background(), &entity.Slug{Value: exits.Slug})
 			require.NoError(t, err)
 			require.Equal(t, resp, want)
 			require.NoError(t, err)

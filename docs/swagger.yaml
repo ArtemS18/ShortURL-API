@@ -36,39 +36,6 @@ info:
   title: ShortURL API
   version: "1.0"
 paths:
-  /{slug}:
-    get:
-      description: Возвращает оригинальный URL для заданной короткой ссылки
-      parameters:
-      - description: Slug
-        in: path
-        name: slug
-        required: true
-        type: string
-      - default: true
-        description: Redirect to original URL instead of returning it in response
-        in: query
-        name: redirect
-        required: true
-        type: boolean
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Successful retrieval, returns the original URL
-          schema:
-            $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_usecase_dto.GetURLResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.BaseErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.BaseErrorResponse'
-      summary: Получение URL по короткой ссылке
-      tags:
-      - slug
   /slugs:
     post:
       description: Возвращает короткую ссылку для заданного URL
@@ -82,19 +49,54 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
-          description: Successful creation, returns the created slug
+        "200":
+          description: Успешный ответ при нахождении соответстующей короткой ссылки
+            в бд
           schema:
             $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_usecase_dto.CreateSlugResponse'
-        "404":
-          description: Not Found
+        "201":
+          description: Успешный ответ при создании новой короткой ссылки
           schema:
-            $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.BaseErrorResponse'
+            $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_usecase_dto.CreateSlugResponse'
         "500":
-          description: Internal Server Error
+          description: Ошибка сервера
           schema:
             $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.BaseErrorResponse'
       summary: Создание короткой ссылки
+      tags:
+      - slug
+  /slugs/{slug}:
+    get:
+      description: Возвращает оригинальный URL для заданной короткой ссылки
+      parameters:
+      - description: Короткая ссылка
+        in: path
+        name: slug
+        required: true
+        type: string
+      - default: true
+        description: Если указан true, то будет выполнин редирект на URL соответсвующий
+          вводимой короткой ссылки
+        in: query
+        name: redirect
+        required: true
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешный ответ, если выбран redirect=false
+          schema:
+            $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_usecase_dto.GetURLResponse'
+        "404":
+          description: URL не найден
+          schema:
+            $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.BaseErrorResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.BaseErrorResponse'
+      summary: Получение URL по короткой ссылке
       tags:
       - slug
 swagger: "2.0"

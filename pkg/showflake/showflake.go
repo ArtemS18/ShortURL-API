@@ -57,34 +57,30 @@ func (sf *Snowflake) NextID() (int64, error) {
 	defer sf.mu.Unlock()
 
 	nowMs := time.Now().UnixMilli() - sf.config.Epoch.UnixMilli()
+
 	if nowMs < sf.lastTimestamp {
-		for time.Now().UnixMilli()-sf.config.Epoch.UnixMilli() < sf.lastTimestamp {
-			time.Sleep(1 * time.Millisecond)
+		return 0, fmt.Errorf("clock moved backwards or invalid epoch: current %d, last %d", nowMs, sf.lastTimestamp)
+	}
+	if nowMs == sf.lastTimestamp {
+		if sf.sequence >= sf.maxSequence {
+			for nowMs <= sf.lastTimestamp {
+				nowMs = time.Now().UnixMilli() - sf.config.Epoch.UnixMilli()
+			}
+			sf.sequence = 0
+		} else {
+			sf.sequence++
 		}
-		nowMs = time.Now().UnixMilli() - sf.config.Epoch.UnixMilli()
-	}
-
-	if nowMs > sf.lastTimestamp {
-		sf.sequence = 0
-	} else if sf.sequence >= sf.maxSequence {
-		for time.Now().UnixMilli()-sf.config.Epoch.UnixMilli() <= sf.lastTimestamp {
-			time.Sleep(1 * time.Millisecond)
-		}
-		nowMs = time.Now().UnixMilli() - sf.config.Epoch.UnixMilli()
+	} else {
 		sf.sequence = 0
 	}
 
-	ts := nowMs
-	if ts > (1<<sf.config.TimestampBits)-1 {
-		return 0, fmt.Errorf("timestamp переполнен")
+	if nowMs > (1<<sf.config.TimestampBits)-1 {
+		return 0, fmt.Errorf("timestamp overflow")
 	}
-
-	id := (ts << sf.timestampShift) |
+	sf.lastTimestamp = nowMs
+	id := (nowMs << sf.timestampShift) |
 		(sf.config.NodeID << sf.nodeShift) |
 		(sf.sequence)
-
-	sf.sequence++
-	sf.lastTimestamp = nowMs
 
 	return id, nil
 }

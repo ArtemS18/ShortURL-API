@@ -11,7 +11,8 @@ type CreateSlugRequest struct {
 }
 
 type CreateSlugResponse struct {
-	SlugURL string `json:"slug"`
+	SlugURL   string `json:"slug"`
+	IsCreated bool   `json:"-"`
 }
 
 type GetURLRequest struct {

@@ -27,8 +27,8 @@ func TestCreateSlug(t *testing.T) {
 			inp:     dto.CreateSlugRequest{URL: "https://www.example.com"},
 			wantErr: nil,
 			setupMocks: func(slugRepo *mocks.MockSlugRepository, slugGen *mocks.MockSlugGenerator) {
-				slugGen.EXPECT().GenerateSlug("https://www.example.com").Return(&dto.CreateSlugDB{Slug: "abc123"}, nil)
-				slugRepo.EXPECT().CreateSlug(gomock.Any(), gomock.Any()).Return(nil)
+				slugGen.EXPECT().GenerateSlug(&entity.URL{Value: "https://www.example.com"}).Return(&dto.CreateSlugDB{Slug: "abc123"}, nil)
+				slugRepo.EXPECT().CreateSlug(gomock.Any(), gomock.Any()).Return(&dto.CreateSlugResponse{SlugURL: "12"}, nil)
 			},
 		},
 		{
@@ -42,8 +42,8 @@ func TestCreateSlug(t *testing.T) {
 			inp:     dto.CreateSlugRequest{URL: "https://www.example.com"},
 			wantErr: entity.ServiceError,
 			setupMocks: func(slugRepo *mocks.MockSlugRepository, slugGen *mocks.MockSlugGenerator) {
-				slugGen.EXPECT().GenerateSlug("https://www.example.com").Return(&dto.CreateSlugDB{Slug: "abc123"}, nil)
-				slugRepo.EXPECT().CreateSlug(gomock.Any(), gomock.Any()).Return(entity.ServiceError)
+				slugGen.EXPECT().GenerateSlug(&entity.URL{Value: "https://www.example.com"}).Return(&dto.CreateSlugDB{Slug: "abc123"}, nil)
+				slugRepo.EXPECT().CreateSlug(gomock.Any(), gomock.Any()).Return(nil, entity.ServiceError)
 			},
 		},
 	}
@@ -84,7 +84,7 @@ func TestGetSlug(t *testing.T) {
 			inp:     dto.GetURLRequest{SlugURL: "2jDafv-I6u"},
 			wantErr: nil,
 			setupMocks: func(slugRepo *mocks.MockSlugRepository, slugGen *mocks.MockSlugGenerator) {
-				slugRepo.EXPECT().GetURL(gomock.Any(), "2jDafv-I6u").Return(&entity.URL{Value: "https://www.example.com"}, nil)
+				slugRepo.EXPECT().GetURL(gomock.Any(), &entity.Slug{Value: "2jDafv-I6u"}).Return(&entity.URL{Value: "https://www.example.com"}, nil)
 			},
 		},
 		{
@@ -98,7 +98,7 @@ func TestGetSlug(t *testing.T) {
 			inp:     dto.GetURLRequest{SlugURL: "2jDafv-I6u"},
 			wantErr: entity.ServiceError,
 			setupMocks: func(slugRepo *mocks.MockSlugRepository, slugGen *mocks.MockSlugGenerator) {
-				slugRepo.EXPECT().GetURL(gomock.Any(), "2jDafv-I6u").Return(nil, entity.ServiceError)
+				slugRepo.EXPECT().GetURL(gomock.Any(), &entity.Slug{Value: "2jDafv-I6u"}).Return(nil, entity.ServiceError)
 			},
 		},
 	}

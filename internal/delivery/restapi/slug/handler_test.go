@@ -27,12 +27,23 @@ func TestCreateSlugHandler(t *testing.T) {
 		expectedBody   string
 	}{
 		{
-			name: "success",
+			name: "success ok",
 			reqBody: map[string]any{
 				"url": valiURL,
 			},
 			setupMock: func(mockUC *mocks.MockSlugUseCase) {
-				mockUC.EXPECT().CreateSlug(gomock.Any(), &dto.CreateSlugRequest{URL: valiURL}).Return(&dto.CreateSlugResponse{SlugURL: "https://test.com/slug"}, nil)
+				mockUC.EXPECT().CreateSlug(gomock.Any(), &dto.CreateSlugRequest{URL: valiURL}).Return(&dto.CreateSlugResponse{SlugURL: "https://test.com/slug", IsCreated: false}, nil)
+
+			},
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name: "success created",
+			reqBody: map[string]any{
+				"url": valiURL,
+			},
+			setupMock: func(mockUC *mocks.MockSlugUseCase) {
+				mockUC.EXPECT().CreateSlug(gomock.Any(), &dto.CreateSlugRequest{URL: valiURL}).Return(&dto.CreateSlugResponse{SlugURL: "https://test.com/slug", IsCreated: true}, nil)
 
 			},
 			expectedStatus: http.StatusCreated,

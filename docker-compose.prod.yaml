@@ -1,0 +1,83 @@
+name: "shorturl-prod"
+
+
+x-shorturl-backend: &shorturl-backend-common
+  build:
+    context: .
+    dockerfile: ./deploy/backend/Dockerfile
+  volumes:
+    - ./config/config.yaml:/app/config/config.yaml
+  expose:
+    - "8000"
+  healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8000/health || exit 1"]
+      interval: 10s
+      retries: 3
+      timeout: 10s
+  depends_on:
+      postgres:
+        condition: service_healthy
+
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: shorturls
+      POSTGRES_PASSWORD: shorturls
+      POSTGRES_DB: main
+    ports:
+      - "5435:5432"
+    volumes:
+      - ./db/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shorturls -d main"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  shorturl-backend-1:
+    <<: *shorturl-backend-common
+    environment:
+      SRV_HOST: 0.0.0.0
+      SRV_NODE_ID: 1
+      DATABASE_TYPE: postgres
+      PG_HOST: postgres
+      PG_PORT: 5432
+      APP_ENV: prod
+      SRV_BASE_URL: http://localhost:8001/api/v1
+
+  shorturl-backend-2:
+    <<: *shorturl-backend-common
+    environment:
+      SRV_HOST: 0.0.0.0
+      SRV_NODE_ID: 2
+      DATABASE_TYPE: postgres
+      PG_HOST: postgres
+      PG_PORT: 5432
+      APP_ENV: prod
+      SRV_BASE_URL: http://localhost:8001/api/v1
+
+  shorturl-backend-3:
+    <<: *shorturl-backend-common
+    environment:
+      SRV_HOST: 0.0.0.0
+      SRV_NODE_ID: 3
+      DATABASE_TYPE: postgres
+      PG_HOST: postgres
+      PG_PORT: 5432
+      APP_ENV: prod
+      SRV_BASE_URL: http://localhost:8001/api/v1
+
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./deploy/nginx/config/nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - 8001:80
+    depends_on:
+      shorturl-backend-1:
+        condition: service_healthy
+      shorturl-backend-2:
+        condition: service_healthy
+      shorturl-backend-3:
+        condition: service_healthy

@@ -43,7 +43,7 @@ func (m *MockSlugGenerator) EXPECT() *MockSlugGeneratorMockRecorder {
 }
 
 // GenerateSlug mocks base method.
-func (m *MockSlugGenerator) GenerateSlug(url string) (*dto.CreateSlugDB, error) {
+func (m *MockSlugGenerator) GenerateSlug(url *entity.URL) (*dto.CreateSlugDB, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GenerateSlug", url)
 	ret0, _ := ret[0].(*dto.CreateSlugDB)
@@ -82,11 +82,12 @@ func (m *MockSlugRepository) EXPECT() *MockSlugRepositoryMockRecorder {
 }
 
 // CreateSlug mocks base method.
-func (m *MockSlugRepository) CreateSlug(ctx context.Context, e *dto.CreateSlugDB) error {
+func (m *MockSlugRepository) CreateSlug(ctx context.Context, e *dto.CreateSlugDB) (*dto.CreateSlugResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateSlug", ctx, e)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(*dto.CreateSlugResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // CreateSlug indicates an expected call of CreateSlug.
@@ -96,7 +97,7 @@ func (mr *MockSlugRepositoryMockRecorder) CreateSlug(ctx, e any) *gomock.Call {
 }
 
 // GetURL mocks base method.
-func (m *MockSlugRepository) GetURL(ctx context.Context, slug string) (*entity.URL, error) {
+func (m *MockSlugRepository) GetURL(ctx context.Context, slug *entity.Slug) (*entity.URL, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetURL", ctx, slug)
 	ret0, _ := ret[0].(*entity.URL)

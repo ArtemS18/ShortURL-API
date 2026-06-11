@@ -3,6 +3,7 @@ package generator
 import (
 	"fmt"
 
+	"github.com/ArtemS18/ShortURL-API/internal/entity"
 	"github.com/ArtemS18/ShortURL-API/internal/usecase/dto"
 	"github.com/ArtemS18/ShortURL-API/pkg/showflake"
 )
@@ -21,14 +22,14 @@ func NewSlugGeneratorUseCase(s *showflake.Snowflake) *SlugGeneratorUseCase {
 	}
 }
 
-func (uc *SlugGeneratorUseCase) GenerateSlug(url string) (*dto.CreateSlugDB, error) {
+func (uc *SlugGeneratorUseCase) GenerateSlug(e *entity.URL) (*dto.CreateSlugDB, error) {
 	id, err := uc.s.NextID()
 	if err != nil {
 		return nil, fmt.Errorf("uc.s.NextID: %w", err)
 	}
 	slug := uc.s.Int64ToBase63(id, SlugLength)
 	return &dto.CreateSlugDB{
-		URL:  url,
+		URL:  e.Value,
 		Slug: slug,
 		ID:   id,
 	}, nil

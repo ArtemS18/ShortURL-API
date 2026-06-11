@@ -26,9 +26,9 @@ func NewSlugHandler(uc delivery.SlugUseCase) *SlugHandler {
 // @Tags slug
 // @Produce json
 // @Param request body dto.CreateSlugRequest true "URL для сокращения"
-// @Success 201 {object} dto.CreateSlugResponse "Successful creation, returns the created slug"
-// @Failure 404 {object} utils.BaseErrorResponse "Not Found"
-// @Failure 500 {object} utils.BaseErrorResponse "Internal Server Error"
+// @Success 200 {object} dto.CreateSlugResponse "Успешный ответ при нахождении соответстующей короткой ссылки в бд"
+// @Success 201 {object} dto.CreateSlugResponse "Успешный ответ при создании новой короткой ссылки"
+// @Failure 500 {object} utils.BaseErrorResponse "Ошибка сервера"
 // @Router /slugs [post]
 func (h *SlugHandler) CreateSlugHandler(w http.ResponseWriter, r *http.Request) {
 	op := "SlugHandler.CreateSlugHandler"
@@ -51,18 +51,23 @@ func (h *SlugHandler) CreateSlugHandler(w http.ResponseWriter, r *http.Request) 
 		utils.HandelError(w, err)
 		return
 	}
-	utils.JSONResponse(w, http.StatusCreated, resp)
+	if resp.IsCreated {
+		utils.JSONResponse(w, http.StatusCreated, resp)
+		return
+	}
+	utils.JSONResponse(w, http.StatusOK, resp)
+
 }
 
 // @Summary Получение URL по короткой ссылке
 // @Description Возвращает оригинальный URL для заданной короткой ссылки
 // @Tags slug
 // @Produce json
-// @Param slug path string true "Slug""
-// @Param redirect query bool true "Redirect to original URL instead of returning it in response"" default(true)
-// @Success 200 {object} dto.GetURLResponse "Successful retrieval, returns the original URL"
-// @Failure 404 {object} utils.BaseErrorResponse "Not Found"
-// @Failure 500 {object} utils.BaseErrorResponse "Internal Server Error"
+// @Param slug path string true "Короткая ссылка""
+// @Param redirect query bool true "Если указан true, то будет выполнин редирект на URL соответсвующий вводимой короткой ссылки"" default(true)
+// @Success 200 {object} dto.GetURLResponse "Успешный ответ, если выбран redirect=false"
+// @Failure 404 {object} utils.BaseErrorResponse "URL не найден"
+// @Failure 500 {object} utils.BaseErrorResponse "Ошибка сервера"
 // @Router /slugs/{slug} [get]
 func (h *SlugHandler) GetURLHandler(w http.ResponseWriter, r *http.Request) {
 	op := "SlugHandler.GetURLHandler"

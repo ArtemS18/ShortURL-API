@@ -58,12 +58,12 @@ func Run(cfg *config.ProjectConfig, log *logrus.Logger) {
 	}
 
 	fkCfg := showflake.SnowflakeConfig{
-		Epoch:         time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
+		Epoch:         time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC),
 		NodeID:        cfg.Server.NodeID,
-		TimestampBits: 41,
-		NodeBits:      10,
-		SequenceBits:  12,
-	}
+		TimestampBits: 41, // 69 лет
+		NodeBits:      8,  // макс 256 нод
+		SequenceBits:  10, // 1024 запроса на ноду в мс
+	} // должно быть в сумме <= 59 чтобы не выйти за предел 10 симв.
 	fk, err := showflake.NewSnowflake(fkCfg)
 	if err != nil {
 		log.Fatalf("cannot create snowflake: %v", err)
