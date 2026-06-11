@@ -11,7 +11,7 @@ import (
 	"github.com/ArtemS18/ShortURL-API/pkg/utils"
 )
 
-var MaxURLLength = 2000
+var MaxURLLength = 2048
 var MaxSlugLength = 10
 
 type SlugUseCase struct {
@@ -61,7 +61,7 @@ func (uc *SlugUseCase) validateURL(url string) error {
 	if url == "" {
 		return entity.NewValidationError("url", "Cant be empty")
 	}
-	if len(url) > MaxURLLength {
+	if len([]rune(url)) > MaxURLLength {
 		return entity.NewValidationError("url", fmt.Sprintf("Too long (max: %d)", MaxURLLength))
 	}
 	if !utils.IsValidURL(url) {
@@ -74,7 +74,7 @@ func (uc *SlugUseCase) validateSlug(slug string) error {
 	if slug == "" {
 		return entity.NewValidationError("slug", "Cant be empty")
 	}
-	if len(slug) > MaxSlugLength {
+	if len([]rune(slug)) > MaxSlugLength {
 		return entity.NewValidationError("slug", fmt.Sprintf("Too long (max: %d)", MaxSlugLength))
 	}
 	if !utils.IsValidSlug(slug) {

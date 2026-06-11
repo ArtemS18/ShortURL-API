@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS  slugs(
     slug TEXT UNIQUE NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), 
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    CONSTRAINT url_length_check CHECK ( LENGTH(url) <= 2000 ),
+    CONSTRAINT url_length_check CHECK ( LENGTH(url) <= 2048 ),
     CONSTRAINT slug_length_check CHECK ( LENGTH(slug) <= 10 ) 
 );
 COMMENT ON TABLE slugs IS 'Сокращенные ссылки';

@@ -87,7 +87,7 @@ func Run(cfg *config.ProjectConfig, log *logrus.Logger) {
 	v1 := api.PathPrefix("/v1").Subrouter()
 	v1.PathPrefix("/docs/").Handler(httpSwagger.WrapHandler)
 	v1.HandleFunc("/slugs", handler.CreateSlugHandler).Methods(http.MethodPost)
-	v1.HandleFunc("/{slug}", handler.GetURLHandler).Methods(http.MethodGet)
+	v1.HandleFunc("/slugs/{slug}", handler.GetURLHandler).Methods(http.MethodGet)
 
 	serverAddress := fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port)
 

@@ -63,7 +63,7 @@ func (h *SlugHandler) CreateSlugHandler(w http.ResponseWriter, r *http.Request) 
 // @Success 200 {object} dto.GetURLResponse "Successful retrieval, returns the original URL"
 // @Failure 404 {object} utils.BaseErrorResponse "Not Found"
 // @Failure 500 {object} utils.BaseErrorResponse "Internal Server Error"
-// @Router /{slug} [get]
+// @Router /slugs/{slug} [get]
 func (h *SlugHandler) GetURLHandler(w http.ResponseWriter, r *http.Request) {
 	op := "SlugHandler.GetURLHandler"
 	log := ctxLogger.GetLogger(r.Context()).WithField("op", op)

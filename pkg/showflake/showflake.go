@@ -9,8 +9,8 @@ import (
 const base63Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-"
 
 type SnowflakeConfig struct {
-	Epoch         time.Time // начало эпохи
-	NodeID        int64     // уникальный ID узла
+	Epoch         time.Time
+	NodeID        int64
 	TimestampBits int
 	NodeBits      int
 	SequenceBits  int
@@ -21,10 +21,10 @@ type Snowflake struct {
 	sequence       int64
 	lastTimestamp  int64
 	mu             sync.Mutex
-	maxSequence    int64 // 2^SequenceBits - 1
-	maxNodeID      int64 // 2^NodeBits - 1
-	timestampShift int   // NodeBits + SequenceBits
-	nodeShift      int   // SequenceBits
+	maxSequence    int64
+	maxNodeID      int64
+	timestampShift int
+	nodeShift      int
 }
 
 func NewSnowflake(cfg SnowflakeConfig) (*Snowflake, error) {
@@ -33,6 +33,11 @@ func NewSnowflake(cfg SnowflakeConfig) (*Snowflake, error) {
 	}
 	if cfg.TimestampBits+cfg.NodeBits+cfg.SequenceBits > 63 {
 		return nil, fmt.Errorf("сумма бит не должна превышать 63")
+	}
+
+	nowMs := time.Now().UnixMilli() - cfg.Epoch.UnixMilli()
+	if nowMs > (1<<cfg.TimestampBits)-1 {
+		return nil, fmt.Errorf("timestamp переполнен")
 	}
 
 	sf := &Snowflake{
@@ -100,7 +105,7 @@ func (sf *Snowflake) Int64ToBase63(id int64, length int) string {
 	return string(result)
 }
 
-func (sf *Snowflake) NextIDInBase63(s string, length int) (string, error) {
+func (sf *Snowflake) NextIDInBase63(length int) (string, error) {
 	id, err := sf.NextID()
 	if err != nil {
 		return "", fmt.Errorf("sf.NextID: %v", err)

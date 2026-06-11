@@ -16,6 +16,7 @@ import (
 )
 
 func TestCreateSlugHandler(t *testing.T) {
+	t.Parallel()
 	valiURL := "http://example.com"
 
 	tests := []struct {
@@ -59,6 +60,7 @@ func TestCreateSlugHandler(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
@@ -81,6 +83,7 @@ func TestCreateSlugHandler(t *testing.T) {
 }
 
 func TestGetURLHandler(t *testing.T) {
+	t.Parallel()
 	valiURL := "http://example.com"
 	validSlug := "slugslug12"
 
@@ -125,6 +128,7 @@ func TestGetURLHandler(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
