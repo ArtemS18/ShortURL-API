@@ -1,6 +1,6 @@
 package dto
 
-type CreateSlug struct {
+type CreateSlugDB struct {
 	URL  string
 	Slug string
 	ID   int64

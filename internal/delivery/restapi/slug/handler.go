@@ -47,7 +47,7 @@ func (h *SlugHandler) CreateSlugHandler(w http.ResponseWriter, r *http.Request) 
 	}
 	resp, err := h.uc.CreateSlug(r.Context(), &req)
 	if err != nil {
-		log.Errorf("h.uc.CreateSlug: %v", err)
+		log.Errorf("h.uc.CreateSlugDB: %v", err)
 		utils.HandelError(w, err)
 		return
 	}

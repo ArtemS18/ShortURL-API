@@ -49,7 +49,7 @@ func (uc *SlugUseCase) CreateSlug(ctx context.Context, e *dto.CreateSlugRequest)
 	if err != nil {
 		return nil, fmt.Errorf("uc.gen.GenerateSlug: %w", err)
 	}
-	_, err = uc.repo.CreateSlug(ctx, slugInfo)
+	err = uc.repo.CreateSlug(ctx, slugInfo)
 	if err != nil {
 		return nil, fmt.Errorf("uc.repo.CreateSlug: %w", err)
 	}

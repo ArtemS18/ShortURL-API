@@ -14,6 +14,7 @@ import (
 )
 
 func TestCreateSlug(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	tests := []struct {
 		name       string
@@ -26,8 +27,8 @@ func TestCreateSlug(t *testing.T) {
 			inp:     dto.CreateSlugRequest{URL: "https://www.example.com"},
 			wantErr: nil,
 			setupMocks: func(slugRepo *mocks.MockSlugRepository, slugGen *mocks.MockSlugGenerator) {
-				slugGen.EXPECT().GenerateSlug("https://www.example.com").Return(&dto.CreateSlug{Slug: "abc123"}, nil)
-				slugRepo.EXPECT().CreateSlug(gomock.Any(), gomock.Any()).Return(&entity.URLInfo{Slug: "abc123"}, nil)
+				slugGen.EXPECT().GenerateSlug("https://www.example.com").Return(&dto.CreateSlugDB{Slug: "abc123"}, nil)
+				slugRepo.EXPECT().CreateSlug(gomock.Any(), gomock.Any()).Return(nil)
 			},
 		},
 		{
@@ -41,13 +42,14 @@ func TestCreateSlug(t *testing.T) {
 			inp:     dto.CreateSlugRequest{URL: "https://www.example.com"},
 			wantErr: entity.ServiceError,
 			setupMocks: func(slugRepo *mocks.MockSlugRepository, slugGen *mocks.MockSlugGenerator) {
-				slugGen.EXPECT().GenerateSlug("https://www.example.com").Return(&dto.CreateSlug{Slug: "abc123"}, nil)
-				slugRepo.EXPECT().CreateSlug(gomock.Any(), gomock.Any()).Return(nil, entity.ServiceError)
+				slugGen.EXPECT().GenerateSlug("https://www.example.com").Return(&dto.CreateSlugDB{Slug: "abc123"}, nil)
+				slugRepo.EXPECT().CreateSlug(gomock.Any(), gomock.Any()).Return(entity.ServiceError)
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
@@ -69,6 +71,7 @@ func TestCreateSlug(t *testing.T) {
 }
 
 func TestGetSlug(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	tests := []struct {
 		name       string
@@ -101,6 +104,7 @@ func TestGetSlug(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
@@ -122,6 +126,7 @@ func TestGetSlug(t *testing.T) {
 }
 
 func TestValidateURL(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name    string
 		inp     string
@@ -190,6 +195,7 @@ func TestValidateURL(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			uc := NewSlugUseCase(nil, nil)
 			err := uc.validateURL(tt.inp)
 			if tt.wantErr {
@@ -202,6 +208,7 @@ func TestValidateURL(t *testing.T) {
 }
 
 func TestValidateSlug(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name    string
 		inp     string
@@ -235,6 +242,7 @@ func TestValidateSlug(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			uc := NewSlugUseCase(nil, nil)
 			err := uc.validateSlug(tt.inp)
 			if tt.wantErr {

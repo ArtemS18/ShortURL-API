@@ -37,6 +37,7 @@ require (
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
 	github.com/joho/godotenv v1.5.1
+	github.com/pashagolub/pgxmock/v3 v3.4.0
 	github.com/sirupsen/logrus v1.9.4
 	github.com/swaggo/http-swagger v1.3.4
 	gopkg.in/yaml.v3 v3.0.1 // indirect

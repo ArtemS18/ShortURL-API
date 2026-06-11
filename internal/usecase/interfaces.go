@@ -9,10 +9,10 @@ import (
 
 //go:generate mockgen -source=interfaces.go -destination=./mocks/mocks_repo.go -package=mocks
 type SlugGenerator interface {
-	GenerateSlug(url string) (*dto.CreateSlug, error)
+	GenerateSlug(url string) (*dto.CreateSlugDB, error)
 }
 
 type SlugRepository interface {
-	CreateSlug(ctx context.Context, e *dto.CreateSlug) (*entity.URLInfo, error)
+	CreateSlug(ctx context.Context, e *dto.CreateSlugDB) error
 	GetURL(ctx context.Context, slug string) (*entity.URL, error)
 }

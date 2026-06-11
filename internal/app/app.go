@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/ArtemS18/ShortURL-API/config"
 	_ "github.com/ArtemS18/ShortURL-API/docs"
+	"github.com/ArtemS18/ShortURL-API/internal/delivery/restapi/middleware"
 	slugHandler "github.com/ArtemS18/ShortURL-API/internal/delivery/restapi/slug"
 	slugInMemoryRepo "github.com/ArtemS18/ShortURL-API/internal/repository/in-memory/slug"
 	slugRepo "github.com/ArtemS18/ShortURL-API/internal/repository/sql/slug"
@@ -73,8 +75,15 @@ func Run(cfg *config.ProjectConfig, log *logrus.Logger) {
 	handler := slugHandler.NewSlugHandler(uc)
 
 	r := mux.NewRouter()
+	LoggingMiddleware := middleware.LoggingMiddleware(log)
+
+	r.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		_ = json.NewEncoder(w).Encode(map[string]bool{"ok": true})
+	}).Methods(http.MethodGet)
 
 	api := r.PathPrefix("/api").Subrouter()
+	api.Use(LoggingMiddleware)
+
 	v1 := api.PathPrefix("/v1").Subrouter()
 	v1.PathPrefix("/docs/").Handler(httpSwagger.WrapHandler)
 	v1.HandleFunc("/slugs", handler.CreateSlugHandler).Methods(http.MethodPost)

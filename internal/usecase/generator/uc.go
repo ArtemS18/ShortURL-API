@@ -21,13 +21,13 @@ func NewSlugGeneratorUseCase(s *showflake.Snowflake) *SlugGeneratorUseCase {
 	}
 }
 
-func (uc *SlugGeneratorUseCase) GenerateSlug(url string) (*dto.CreateSlug, error) {
+func (uc *SlugGeneratorUseCase) GenerateSlug(url string) (*dto.CreateSlugDB, error) {
 	id, err := uc.s.NextID()
 	if err != nil {
 		return nil, fmt.Errorf("uc.s.NextID: %w", err)
 	}
 	slug := uc.s.Int64ToBase63(id, SlugLength)
-	return &dto.CreateSlug{
+	return &dto.CreateSlugDB{
 		URL:  url,
 		Slug: slug,
 		ID:   id,

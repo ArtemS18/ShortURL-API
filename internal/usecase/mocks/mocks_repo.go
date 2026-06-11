@@ -43,10 +43,10 @@ func (m *MockSlugGenerator) EXPECT() *MockSlugGeneratorMockRecorder {
 }
 
 // GenerateSlug mocks base method.
-func (m *MockSlugGenerator) GenerateSlug(url string) (*dto.CreateSlug, error) {
+func (m *MockSlugGenerator) GenerateSlug(url string) (*dto.CreateSlugDB, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GenerateSlug", url)
-	ret0, _ := ret[0].(*dto.CreateSlug)
+	ret0, _ := ret[0].(*dto.CreateSlugDB)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -82,12 +82,11 @@ func (m *MockSlugRepository) EXPECT() *MockSlugRepositoryMockRecorder {
 }
 
 // CreateSlug mocks base method.
-func (m *MockSlugRepository) CreateSlug(ctx context.Context, e *dto.CreateSlug) (*entity.URLInfo, error) {
+func (m *MockSlugRepository) CreateSlug(ctx context.Context, e *dto.CreateSlugDB) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateSlug", ctx, e)
-	ret0, _ := ret[0].(*entity.URLInfo)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // CreateSlug indicates an expected call of CreateSlug.
