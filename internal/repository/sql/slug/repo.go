@@ -25,14 +25,14 @@ func (r *SlugRepo) GetURL(ctx context.Context, slug string) (*entity.URL, error)
 	row, err := r.pool.Query(ctx, sql, slug)
 
 	if err != nil {
-		return nil, repo.HandelPgErrors(err)
+		return nil, repo.HandelPgErrors(err, "slug")
 	}
 
 	defer row.Close()
 
 	urlEntity, err := pgx.CollectExactlyOneRow(row, pgx.RowToStructByName[entity.URL])
 	if err != nil {
-		return nil, repo.HandelPgErrors(err)
+		return nil, repo.HandelPgErrors(err, "slug")
 	}
 
 	return &urlEntity, nil
@@ -43,13 +43,13 @@ func (r *SlugRepo) CreateSlug(ctx context.Context, e *dto.CreateSlug) (*entity.U
 	sql := `INSERT INTO slugs (id, slug, url) VALUES ($1, $2, $3) RETURNING id, slug, url`
 	row, err := r.pool.Query(ctx, sql, e.ID, e.Slug, e.URL)
 	if err != nil {
-		return nil, repo.HandelPgErrors(err)
+		return nil, repo.HandelPgErrors(err, "slug")
 	}
 	defer row.Close()
 
 	slugEntity, err := pgx.CollectExactlyOneRow(row, pgx.RowToStructByName[entity.URLInfo])
 	if err != nil {
-		return nil, repo.HandelPgErrors(err)
+		return nil, repo.HandelPgErrors(err, "slug")
 	}
 	return &slugEntity, nil
 }

@@ -41,7 +41,7 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
+                    "201": {
                         "description": "Successful creation, returns the created slug",
                         "schema": {
                             "$ref": "#/definitions/github_com_ArtemS18_ShortURL-API_internal_usecase_dto.CreateSlugResponse"
@@ -50,13 +50,13 @@ const docTemplate = `{
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.ErrorResponse"
+                            "$ref": "#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.BaseErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.ErrorResponse"
+                            "$ref": "#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.BaseErrorResponse"
                         }
                     }
                 }
@@ -76,8 +76,16 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Slug",
-                        "name": "{slug}",
+                        "name": "slug",
                         "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Redirect to original URL instead of returning it in response",
+                        "name": "redirect",
+                        "in": "query",
                         "required": true
                     }
                 ],
@@ -91,13 +99,13 @@ const docTemplate = `{
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.ErrorResponse"
+                            "$ref": "#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.BaseErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.ErrorResponse"
+                            "$ref": "#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.BaseErrorResponse"
                         }
                     }
                 }
@@ -105,11 +113,12 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.ErrorResponse": {
+        "github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.BaseErrorResponse": {
             "type": "object",
             "properties": {
-                "details": {
-                    "type": "string"
+                "error": {},
+                "success": {
+                    "type": "boolean"
                 }
             }
         },

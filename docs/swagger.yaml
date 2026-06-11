@@ -1,9 +1,10 @@
 basePath: /api/v1
 definitions:
-  github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.ErrorResponse:
+  github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.BaseErrorResponse:
     properties:
-      details:
-        type: string
+      error: {}
+      success:
+        type: boolean
     type: object
   github_com_ArtemS18_ShortURL-API_internal_usecase_dto.CreateSlugRequest:
     properties:
@@ -41,9 +42,15 @@ paths:
       parameters:
       - description: Slug
         in: path
-        name: '{slug}'
+        name: slug
         required: true
         type: string
+      - default: true
+        description: Redirect to original URL instead of returning it in response
+        in: query
+        name: redirect
+        required: true
+        type: boolean
       produces:
       - application/json
       responses:
@@ -54,11 +61,11 @@ paths:
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.ErrorResponse'
+            $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.BaseErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.ErrorResponse'
+            $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.BaseErrorResponse'
       summary: Получение URL по короткой ссылке
       tags:
       - slug
@@ -75,18 +82,18 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
+        "201":
           description: Successful creation, returns the created slug
           schema:
             $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_usecase_dto.CreateSlugResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.ErrorResponse'
+            $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.BaseErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.ErrorResponse'
+            $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.BaseErrorResponse'
       summary: Создание короткой ссылки
       tags:
       - slug

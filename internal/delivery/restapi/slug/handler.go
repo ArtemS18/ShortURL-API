@@ -26,9 +26,9 @@ func NewSlugHandler(uc delivery.SlugUseCase) *SlugHandler {
 // @Tags slug
 // @Produce json
 // @Param request body dto.CreateSlugRequest true "URL для сокращения"
-// @Success 200 {object} dto.CreateSlugResponse "Successful creation, returns the created slug"
-// @Failure 404 {object} utils.ErrorResponse
-// @Failure 500 {object} utils.ErrorResponse
+// @Success 201 {object} dto.CreateSlugResponse "Successful creation, returns the created slug"
+// @Failure 404 {object} utils.BaseErrorResponse "Not Found"
+// @Failure 500 {object} utils.BaseErrorResponse "Internal Server Error"
 // @Router /slugs [post]
 func (h *SlugHandler) CreateSlugHandler(w http.ResponseWriter, r *http.Request) {
 	op := "SlugHandler.CreateSlugHandler"
@@ -58,14 +58,17 @@ func (h *SlugHandler) CreateSlugHandler(w http.ResponseWriter, r *http.Request) 
 // @Description Возвращает оригинальный URL для заданной короткой ссылки
 // @Tags slug
 // @Produce json
-// @Param {slug} path string true "Slug""
+// @Param slug path string true "Slug""
+// @Param redirect query bool true "Redirect to original URL instead of returning it in response"" default(true)
 // @Success 200 {object} dto.GetURLResponse "Successful retrieval, returns the original URL"
-// @Failure 404 {object} utils.ErrorResponse
-// @Failure 500 {object} utils.ErrorResponse
+// @Failure 404 {object} utils.BaseErrorResponse "Not Found"
+// @Failure 500 {object} utils.BaseErrorResponse "Internal Server Error"
 // @Router /{slug} [get]
 func (h *SlugHandler) GetURLHandler(w http.ResponseWriter, r *http.Request) {
 	op := "SlugHandler.GetURLHandler"
 	log := ctxLogger.GetLogger(r.Context()).WithField("op", op)
+
+	redirect := r.URL.Query().Get("redirect")
 
 	vars := mux.Vars(r)
 
@@ -82,6 +85,10 @@ func (h *SlugHandler) GetURLHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Errorf("h.uc.GetURL: %v", err)
 		utils.HandelError(w, err)
+		return
+	}
+	if redirect != "false" {
+		http.Redirect(w, r, resp.URL, http.StatusMovedPermanently)
 		return
 	}
 	utils.JSONResponse(w, http.StatusOK, resp)
