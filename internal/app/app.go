@@ -22,6 +22,7 @@ import (
 	"github.com/ArtemS18/ShortURL-API/pkg/utils"
 	"github.com/gorilla/mux"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/rs/cors"
 	"github.com/sirupsen/logrus"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
@@ -57,12 +58,12 @@ func Run(cfg *config.ProjectConfig, log *logrus.Logger) {
 	}
 
 	fkCfg := showflake.SnowflakeConfig{
-		Epoch:         time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC),
+		Epoch:         cfg.Epoch,
 		NodeID:        cfg.Server.NodeID,
-		TimestampBits: 41, // 69 лет
-		NodeBits:      8,  // макс 256 нод
-		SequenceBits:  10, // 1024 запроса на ноду в мс
-	} // должно быть в сумме <= 59 чтобы не выйти за предел 10 симв.
+		TimestampBits: cfg.ShowFlake.TimestampBits,
+		NodeBits:      cfg.ShowFlake.NodeBits,
+		SequenceBits:  cfg.ShowFlake.SequenceBits,
+	}
 	fk, err := showflake.NewSnowflake(fkCfg)
 	if err != nil {
 		log.Fatalf("cannot create snowflake: %v", err)
@@ -75,13 +76,20 @@ func Run(cfg *config.ProjectConfig, log *logrus.Logger) {
 
 	r := mux.NewRouter()
 	LoggingMiddleware := middleware.LoggingMiddleware(log)
+	r.Use(LoggingMiddleware)
 
 	r.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		_ = json.NewEncoder(w).Encode(map[string]bool{"ok": true})
 	}).Methods(http.MethodGet)
 
 	api := r.PathPrefix("/").Subrouter()
-	api.Use(LoggingMiddleware)
+	CORS := cors.New(cors.Options{
+		AllowedOrigins:   config.Config.CORS.AllowedOrigins,
+		AllowedMethods:   config.Config.AllowedMethods,
+		AllowedHeaders:   config.Config.AllowedHeaders,
+		AllowCredentials: true,
+	})
+	api.Use(CORS.Handler)
 
 	// v1 := api.PathPrefix("/v1").Subrouter()
 	api.PathPrefix("/docs/").Handler(httpSwagger.WrapHandler)

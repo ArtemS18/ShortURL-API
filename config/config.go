@@ -18,6 +18,7 @@ type (
 		CORS         `yaml:"cors"`
 		Server       `yaml:"server"`
 		Postgres     `yaml:"postgres"`
+		ShowFlake    `yaml:"showflake"`
 	}
 
 	CORS struct {
@@ -45,6 +46,12 @@ type (
 		SslMode         string        `yaml:"sslmode" env:"PG_SSL_MODE" env-default:"disable"`
 		MaxOpenConns    int           `yaml:"max-open-connections" env:"PG_MAX_OPEN_CONN" env-default:"10"`
 		ConnMaxLifetime time.Duration `yaml:"conn-max-lifetime" env:"PG_CONN_MAX_LIFETIME" env-default:"30s"`
+	}
+	ShowFlake struct {
+		Epoch         time.Time `yaml:"epoch"    env:"SF_EPOCH" env-default:"2026-01-01T00:00:00Z"`
+		TimestampBits int       `yaml:"timestamp-bits"    env:"SF_TS_BITS" env-default:"41"`
+		NodeBits      int       `yaml:"node-bits"    env:"SF_NODE_BITS" env-default:"8"`
+		SequenceBits  int       `yaml:"sequence-bits"    env:"SF_SQ_BITS" env-default:"10"`
 	}
 )
 

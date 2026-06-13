@@ -96,6 +96,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/github_com_ArtemS18_ShortURL-API_internal_usecase_dto.GetURLResponse"
                         }
                     },
+                    "301": {
+                        "description": "Редирект на URL соответсвующий вводимой короткой ссылки",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_ArtemS18_ShortURL-API_internal_usecase_dto.GetURLResponse"
+                        }
+                    },
                     "404": {
                         "description": "URL не найден",
                         "schema": {
@@ -159,7 +165,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version: "1.0",
-	// Host:             "localhost:8000",
+	//Host:             "localhost:8000",
 	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "ShortURL API",

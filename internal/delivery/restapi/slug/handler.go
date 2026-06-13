@@ -66,6 +66,7 @@ func (h *SlugHandler) CreateSlugHandler(w http.ResponseWriter, r *http.Request) 
 // @Param slug path string true "Короткая ссылка""
 // @Param redirect query bool true "Если указан true, то будет выполнин редирект на URL соответсвующий вводимой короткой ссылки"" default(true)
 // @Success 200 {object} dto.GetURLResponse "Успешный ответ, если выбран redirect=false"
+// @Success 301 {object} dto.GetURLResponse "Редирект на URL соответсвующий вводимой короткой ссылки"
 // @Failure 404 {object} utils.BaseErrorResponse "URL не найден"
 // @Failure 500 {object} utils.BaseErrorResponse "Ошибка сервера"
 // @Router /{slug} [get]

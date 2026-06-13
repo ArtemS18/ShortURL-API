@@ -58,6 +58,10 @@ paths:
           description: Успешный ответ, если выбран redirect=false
           schema:
             $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_usecase_dto.GetURLResponse'
+        "301":
+          description: Редирект на URL соответсвующий вводимой короткой ссылки
+          schema:
+            $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_usecase_dto.GetURLResponse'
         "404":
           description: URL не найден
           schema:
