@@ -29,7 +29,7 @@ make prod
 ```
 
 * **Точка входа (Nginx балансировщик):** `http://localhost:8001`
-* **Swagger:** `http://localhost:8001/api/v1/docs/docs/index.html`
+* **Swagger:** `http://localhost:8001/api/v1/docs/index.html`
 * **PostgreSQL:** `localhost:5435`
 
 ### Тестирование и покрытие кодом
