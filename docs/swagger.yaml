@@ -1,4 +1,3 @@
-basePath: /api/v1
 definitions:
   github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.BaseErrorResponse:
     properties:
@@ -36,36 +35,7 @@ info:
   title: ShortURL API
   version: "1.0"
 paths:
-  /slugs:
-    post:
-      description: Возвращает короткую ссылку для заданного URL
-      parameters:
-      - description: URL для сокращения
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_usecase_dto.CreateSlugRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Успешный ответ при нахождении соответстующей короткой ссылки
-            в бд
-          schema:
-            $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_usecase_dto.CreateSlugResponse'
-        "201":
-          description: Успешный ответ при создании новой короткой ссылки
-          schema:
-            $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_usecase_dto.CreateSlugResponse'
-        "500":
-          description: Ошибка сервера
-          schema:
-            $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.BaseErrorResponse'
-      summary: Создание короткой ссылки
-      tags:
-      - slug
-  /slugs/{slug}:
+  /{slug}:
     get:
       description: Возвращает оригинальный URL для заданной короткой ссылки
       parameters:
@@ -97,6 +67,35 @@ paths:
           schema:
             $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.BaseErrorResponse'
       summary: Получение URL по короткой ссылке
+      tags:
+      - slug
+  /slugs:
+    post:
+      description: Возвращает короткую ссылку для заданного URL
+      parameters:
+      - description: URL для сокращения
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_usecase_dto.CreateSlugRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешный ответ при нахождении соответстующей короткой ссылки
+            в бд
+          schema:
+            $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_usecase_dto.CreateSlugResponse'
+        "201":
+          description: Успешный ответ при создании новой короткой ссылки
+          schema:
+            $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_usecase_dto.CreateSlugResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.BaseErrorResponse'
+      summary: Создание короткой ссылки
       tags:
       - slug
 swagger: "2.0"

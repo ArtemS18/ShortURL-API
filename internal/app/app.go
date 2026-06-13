@@ -34,7 +34,6 @@ import (
 // @license.name  MIT
 
 // @host      localhost:8000
-// @BasePath  /api/v1
 
 // @externalDocs.description  OpenAPI
 // @externalDocs.url          https://swagger.io/resources/open-api/
@@ -81,13 +80,13 @@ func Run(cfg *config.ProjectConfig, log *logrus.Logger) {
 		_ = json.NewEncoder(w).Encode(map[string]bool{"ok": true})
 	}).Methods(http.MethodGet)
 
-	api := r.PathPrefix("/api").Subrouter()
+	api := r.PathPrefix("/").Subrouter()
 	api.Use(LoggingMiddleware)
 
-	v1 := api.PathPrefix("/v1").Subrouter()
-	v1.PathPrefix("/docs/").Handler(httpSwagger.WrapHandler)
-	v1.HandleFunc("/slugs", handler.CreateSlugHandler).Methods(http.MethodPost)
-	v1.HandleFunc("/slugs/{slug}", handler.GetURLHandler).Methods(http.MethodGet)
+	// v1 := api.PathPrefix("/v1").Subrouter()
+	api.PathPrefix("/docs/").Handler(httpSwagger.WrapHandler)
+	api.HandleFunc("/slugs", handler.CreateSlugHandler).Methods(http.MethodPost)
+	api.HandleFunc("/{slug}", handler.GetURLHandler).Methods(http.MethodGet)
 
 	serverAddress := fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port)
 

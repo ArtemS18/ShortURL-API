@@ -41,20 +41,20 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Successful creation, returns the created slug",
+                    "200": {
+                        "description": "Успешный ответ при нахождении соответстующей короткой ссылки в бд",
                         "schema": {
                             "$ref": "#/definitions/github_com_ArtemS18_ShortURL-API_internal_usecase_dto.CreateSlugResponse"
                         }
                     },
-                    "404": {
-                        "description": "Not Found",
+                    "201": {
+                        "description": "Успешный ответ при создании новой короткой ссылки",
                         "schema": {
-                            "$ref": "#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.BaseErrorResponse"
+                            "$ref": "#/definitions/github_com_ArtemS18_ShortURL-API_internal_usecase_dto.CreateSlugResponse"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Ошибка сервера",
                         "schema": {
                             "$ref": "#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.BaseErrorResponse"
                         }
@@ -75,7 +75,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Slug",
+                        "description": "Короткая ссылка",
                         "name": "slug",
                         "in": "path",
                         "required": true
@@ -83,7 +83,7 @@ const docTemplate = `{
                     {
                         "type": "boolean",
                         "default": true,
-                        "description": "Redirect to original URL instead of returning it in response",
+                        "description": "Если указан true, то будет выполнин редирект на URL соответсвующий вводимой короткой ссылки",
                         "name": "redirect",
                         "in": "query",
                         "required": true
@@ -91,19 +91,19 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful retrieval, returns the original URL",
+                        "description": "Успешный ответ, если выбран redirect=false",
                         "schema": {
                             "$ref": "#/definitions/github_com_ArtemS18_ShortURL-API_internal_usecase_dto.GetURLResponse"
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "URL не найден",
                         "schema": {
                             "$ref": "#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.BaseErrorResponse"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Ошибка сервера",
                         "schema": {
                             "$ref": "#/definitions/github_com_ArtemS18_ShortURL-API_internal_delivery_restapi_utils.BaseErrorResponse"
                         }
@@ -158,13 +158,16 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0",
-	BasePath:         "/api/v1",
+	Version: "1.0",
+	// Host:             "localhost:8000",
+	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "ShortURL API",
 	Description:      "Created by Artemii in 2026",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
+	LeftDelim:        "{{",
+	RightDelim:       "}}",
 }
 
 func init() {

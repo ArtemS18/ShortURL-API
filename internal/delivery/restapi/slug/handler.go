@@ -68,7 +68,7 @@ func (h *SlugHandler) CreateSlugHandler(w http.ResponseWriter, r *http.Request) 
 // @Success 200 {object} dto.GetURLResponse "Успешный ответ, если выбран redirect=false"
 // @Failure 404 {object} utils.BaseErrorResponse "URL не найден"
 // @Failure 500 {object} utils.BaseErrorResponse "Ошибка сервера"
-// @Router /slugs/{slug} [get]
+// @Router /{slug} [get]
 func (h *SlugHandler) GetURLHandler(w http.ResponseWriter, r *http.Request) {
 	op := "SlugHandler.GetURLHandler"
 	log := ctxLogger.GetLogger(r.Context()).WithField("op", op)

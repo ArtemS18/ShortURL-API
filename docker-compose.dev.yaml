@@ -30,7 +30,7 @@ services:
       DATABASE_TYPE: postgres
       PG_HOST: postgres
       PG_PORT: 5432
-      SRV_BASE_URL: http://localhost:8000/api/v1
+      SRV_BASE_URL: http://localhost:8000
       
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8000/health || exit 1"]

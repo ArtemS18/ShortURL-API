@@ -20,7 +20,7 @@ type SlugUseCase struct {
 }
 
 func createSlugURL(slug string) string {
-	return fmt.Sprintf("%s%s/%s", config.Config.Server.BaseURL, "/slugs", slug)
+	return fmt.Sprintf("%s/%s", config.Config.Server.BaseURL, slug)
 }
 
 func NewSlugUseCase(repo usecase.SlugRepository, gen usecase.SlugGenerator) *SlugUseCase {
