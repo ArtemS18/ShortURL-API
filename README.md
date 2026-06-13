@@ -16,7 +16,7 @@ make dev
 ```
 
 * **API эндпоинты:** `http://localhost:8000`
-* **Swagger:** `http://localhost:8000/api/v1/docs/index.html`
+* **Swagger:** `http://localhost:8000/docs/index.html`
 * **PostgreSQL:** `localhost:5434`
 
 ### Продакшен окружение (Production)
@@ -29,7 +29,7 @@ make prod
 ```
 
 * **Точка входа (Nginx балансировщик):** `http://localhost:8001`
-* **Swagger:** `http://localhost:8001/api/v1/docs/index.html`
+* **Swagger:** `http://localhost:8001/docs/index.html`
 * **PostgreSQL:** `localhost:5435`
 
 ### Тестирование и покрытие кодом
