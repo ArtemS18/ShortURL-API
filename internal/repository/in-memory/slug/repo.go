@@ -14,7 +14,7 @@ type InsertResult struct {
 }
 
 type SlugRepo struct {
-	mx    sync.Mutex
+	mx    sync.RWMutex
 	slugs map[string]string
 	urls  map[string]string
 }
@@ -27,8 +27,8 @@ func NewInMemorySlugRepo() *SlugRepo {
 }
 
 func (r *SlugRepo) GetURL(ctx context.Context, slug *entity.Slug) (*entity.URL, error) {
-	r.mx.Lock()
-	defer r.mx.Unlock()
+	r.mx.RLock()
+	defer r.mx.RUnlock()
 
 	url, ok := r.slugs[slug.Value]
 	if !ok {
